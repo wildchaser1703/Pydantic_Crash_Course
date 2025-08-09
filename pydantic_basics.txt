@@ -1,0 +1,8 @@
+1. Define a pydantic class(model) that represents the ideal schema of the data (Type validation and data validation)
+    - This includes the expected fields, their types, and any validation constraints (eg: gt=0 for positive numbers)
+2. Instantiate the model with raw input data (usually a dictionary or a JSON-like structure)
+    -Pydantic will automatically validate the data and coerce it into the correct python types(if possible).
+    - If the data doesn't meet the model requirements, then Pydantic raises a validation error
+3. Pass the validated model object to functions or use it throughout your codebase.
+    - This ensures that every part of your program works with clean, type-safe, andf logically valid data.
+4. Use Field to set constarints on both the numerical as well as categorical data. It helps the developer to add metadata as well.
