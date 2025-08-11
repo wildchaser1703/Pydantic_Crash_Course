@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, AnyUrl, Field, field_validator
+from pydantic import BaseModel, EmailStr, AnyUrl, model_validator
 from typing import List, Dict, Optional, Annotated
 
 class Patient(BaseModel):
@@ -11,21 +11,12 @@ class Patient(BaseModel):
     married : bool
     contact_details : Dict[str, str]
 
-    @field_validator("email")
-    @classmethod
-    def email_validator(cls, value):
-        valid_domains = ["hdfc.com", "icici.com"]
-        domain_name = value.split("@")[-1]
-        if domain_name not in valid_domains:
-            raise ValueError("Not a valid domain")
-        return value
-    
-    @field_validator("age", mode="before")
-    @classmethod
-    def age_validator(cls, value):
-        if 0 < value < 60:
-            return value
-        raise ValueError("Age should be between 0 and 60")
+    @model_validator(mode='after')
+    def validate_emergency_contact(cls, model):
+        if model.age > 60 and 'emergency' not in model.contact_details:
+            raise ValueError("Patients over 60 must have an emergency contact in contact_details.")
+        return model
+
 
 def insert_patient_data(patient: Patient):
     print(patient.name)
@@ -40,11 +31,14 @@ def update_patient_data(patient: Patient):
 patient_info = {
     "name" : "Anita", 
     "age" : 30, 
+    # if age is 65
     "email" : "abc12@hdfc.com",
     "linkedin_url": "https://www.linkedin.com/abc123",
     "weight" : 52.7, 
     "married" : False, 
     "contact_details" : {"mobile" : "90909090"},}
+    # then contact details
+    # "contact_details" : {"emergency" : "90909090"},}
 
 # Unpack the dictionary
 patient_1 = Patient(**patient_info)
